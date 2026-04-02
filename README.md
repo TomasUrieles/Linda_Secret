@@ -1,159 +1,162 @@
-# Something About Linda 💗
-## Guía completa para personalizar y publicar tu página
+# Something About Linda v2 💗
+## Guía completa de personalización y publicación
 
 ---
 
-## 📁 Estructura de archivos
+## 📁 Archivos que necesitas subir a GitHub
+
 ```
-something-about-linda/
-├── index.html      ← estructura de todas las escenas
-├── style.css       ← estilos y animaciones
-├── script.js       ← lógica y transiciones
-├── music.mp3       ← pon aquí el audio (Something About Us)
-├── tu-video.mp4    ← pon aquí tu video especial
-└── fotos/          ← (opcional) carpeta con tus fotos
+📁 tu-repositorio/
+├── index.html          ← no tocar (estructura)
+├── style.css           ← no tocar (estilos)
+├── script.js           ← editar para personalizar
+├── music.mp3           ← "Something About Us" - Daft Punk
+├── tu-video.mp4        ← tu video especial para ella
+└── fotos/
+    ├── foto1.jpg
+    ├── foto2.jpg
+    ├── foto3.jpg
+    ├── foto4.jpg
+    ├── foto5.jpg
+    └── foto6.jpg
 ```
 
 ---
 
-## 🎵 Agregar la música (Something About Us – Daft Punk)
+## 🗺️ Mapa de las 16 escenas
 
-1. Descarga el mp3 de la canción (YouTube to MP3, Spotify downloader, etc.)
-2. Renómbrala exactamente: **`music.mp3`**
-3. Ponla en la misma carpeta que `index.html`
-4. ¡Listo! Se reproducirá automáticamente al tocar la pantalla.
+| # | Escena | Qué contiene |
+|---|--------|-------------|
+| 0 | Intro | Vinilo grande girando con "Something About Linda" en el centro |
+| 1 | Universo | Planeta B-612 con tulipán flotante, texto de introducción |
+| 2 | Acertijo 1 | Coca-Cola Zero 🥤 |
+| 3 | Carta I | "Quién eres" — carta sobre su fuerza y su historia |
+| 4 | Pájaro de origami | La carta vuela y la lleva a un nuevo planeta |
+| 5 | Seraphine | Escena de cosplay, pétalos y notas musicales |
+| 6 | Acertijo 2 | Daft Punk 🎵 |
+| 7 | Daft Punk | Dos cascos animados, letras de "Something About Us" |
+| 8 | Arthur Morgan | Diálogo con la monjita, línea por línea |
+| 9 | Gastronomía | Plato animado, sueño de la cocina mexicana |
+| 10 | Carta II | "Lo que admiro" — carta sobre su talento |
+| 11 | Acertijo 3 | El Principito / frase del zorro 🦊 |
+| 12 | Fotos | 6 polaroids — cada una abre una carta personalizada |
+| 13 | Mensaje secreto | 6 cartas con palabras que forman un mensaje |
+| 14 | Video | Tu video especial para ella |
+| 15 | Propuesta | Carta final + pregunta + botón "No" que huye |
 
 ---
 
-## 🎬 Agregar tu video especial
+## ✏️ Cómo personalizar
 
-1. Ten listo tu video en formato `.mp4`
-2. Renómbralo como desees (ejemplo: `para-linda.mp4`)
-3. En `index.html`, busca esta línea:
+### 1. Las cartas de las fotos (Escena 12)
+En `script.js`, busca `const PHOTO_DATA = {` y edita cada entrada:
+```js
+p1: {
+  img: "fotos/foto1.jpg",       // ruta a tu foto
+  tag: "✦ Carta — El día que...", // título de la carta
+  body: "Aquí va el texto que escribes tú sobre esta foto y lo que significa."
+},
+```
+Repite para p2, p3, p4, p5, p6.
+
+### 2. El mensaje secreto (Escena 13)
+Las 6 cartas forman la frase: **"Quiero ser parte de tu mundo."**
+Si quieres cambiarla, en `index.html` edita `data-word` en cada `.secret-env`:
+```html
+<div class="secret-env" data-word="TU_PALABRA" data-order="1">
+```
+Y edita también el `<p class="se-title">` y `<p class="se-body">` de cada carta.
+
+### 3. Las cartas de sobre (Escenas 3 y 10)
+En `index.html` busca `<div class="letter-open"` y edita los `<p>` dentro.
+
+### 4. La carta final (Escena 15)
+En `index.html` busca `<div class="prop-body">` y reescribe los párrafos con tus propias palabras.
+
+### 5. El caption de cada polaroid
+En `index.html`, busca los `.pol-cap` y reemplaza `[ caption ]` con texto real.
+
+---
+
+## 🎵 Agregar la música
+
+1. Descarga "Something About Us - Daft Punk" en mp3
+2. Nómbralo exactamente: **`music.mp3`**
+3. Ponlo en la misma carpeta que `index.html`
+
+---
+
+## 🎬 Agregar el video
+
+1. Renombra tu video a lo que quieras (ej: `para-linda.mp4`)
+2. En `index.html`, busca:
    ```html
    <source src="tu-video-aqui.mp4" type="video/mp4" />
    ```
-4. Cambia `tu-video-aqui.mp4` por el nombre de tu archivo.
-5. En `script.js`, busca:
+   Cámbialo por tu nombre de archivo.
+
+3. En `script.js`, busca:
    ```js
-   if (!videoEl.src || videoEl.src.includes("tu-video-aqui"))
+   if (!videoEl.currentSrc || videoEl.currentSrc.includes("tu-video-aqui"))
    ```
-   Cambia `"tu-video-aqui"` por el nombre de tu archivo.
+   Cambia `"tu-video-aqui"` por tu nombre de archivo.
 
 ---
 
-## 📷 Agregar tus fotos (Escena 8)
+## 📷 Agregar tus fotos
 
-En `index.html`, encuentra los bloques `.polaroid`. Cada uno tiene:
+Para reemplazar un placeholder, en `index.html` encuentra el polaroid correspondiente:
 ```html
-<div class="polaroid-img placeholder-img">
-  <span>📷</span>
-  <p>foto 1</p>
-</div>
-<p class="polaroid-caption">[ tu caption aquí ]</p>
-```
+<!-- ANTES -->
+<div class="pol-img placeholder"><span>📷</span><small>foto 1</small></div>
 
-### Para poner una foto real:
-Reemplaza el bloque `placeholder-img` por:
-```html
-<div class="polaroid-img">
-  <img src="fotos/foto1.jpg" alt="descripción" />
+<!-- DESPUÉS -->
+<div class="pol-img">
+  <img src="fotos/foto1.jpg" alt="Linda" />
 </div>
 ```
-Y cambia el caption por algo lindo y personalizado.
 
 ---
 
-## ✏️ Personalizar los textos
+## 🚀 Publicar en GitHub Pages
 
-### Carta #1 (Escena 3)
-En `index.html`, busca `<div class="letter-paper"` y edita el `<p>` dentro.
+### Paso 1 — Repositorio
+1. Ve a github.com → New repository
+2. Nombre: `something-about-linda` (o el que quieras)
+3. Visibilidad: **Public**
+4. Clic en "Create repository"
 
-### Carta final / Propuesta (Escena 11)
-Busca `<div class="p-letter-body">` y edita los párrafos. Es el texto más importante — hazlo tuyo completamente.
+### Paso 2 — Subir archivos
+1. En tu repo, clic en **"uploading an existing file"**
+2. Arrastra: `index.html`, `style.css`, `script.js`, `music.mp3`, video, y carpeta `fotos/`
+3. Commit: "Something About Linda 💗"
 
-### Acertijos
-Busca cada `riddle-q` para editar la pregunta, y los `riddle-opt` para cambiar las opciones.
-El botón con `data-correct="true"` es el correcto.
+### Paso 3 — Activar Pages
+1. Settings → Pages (menú lateral)
+2. Source: "Deploy from a branch"
+3. Branch: **main**, carpeta: **/ (root)**
+4. Save → espera 2 minutos
 
----
-
-## 🚀 Subir a GitHub Pages (paso a paso)
-
-### Paso 1 — Crea el repositorio
-1. Ve a [github.com](https://github.com) e inicia sesión
-2. Haz clic en **"New repository"**
-3. Nombre sugerido: `something-about-linda`
-4. Ponlo en **Public** (necesario para Pages gratuito)
-5. Haz clic en **"Create repository"**
-
-### Paso 2 — Sube los archivos
-**Opción A — Desde la web (más fácil):**
-1. En tu repositorio nuevo, haz clic en **"uploading an existing file"**
-2. Arrastra todos tus archivos (`index.html`, `style.css`, `script.js`, `music.mp3`, tu video, tus fotos)
-3. Escribe un mensaje de commit como `"Primer commit 💗"`
-4. Haz clic en **"Commit changes"**
-
-**Opción B — Con Git:**
-```bash
-git init
-git add .
-git commit -m "Something About Linda 💗"
-git remote add origin https://github.com/TU_USUARIO/something-about-linda.git
-git push -u origin main
-```
-
-### Paso 3 — Activar GitHub Pages
-1. En tu repositorio, ve a **Settings** → **Pages** (menú lateral)
-2. En **"Source"**, selecciona **"Deploy from a branch"**
-3. Selecciona la rama **main** y carpeta **/ (root)**
-4. Haz clic en **Save**
-5. Espera 1-2 minutos
-
-### Paso 4 — Tu URL
-Tu página estará en:
+### Tu URL:
 ```
 https://TU_USUARIO.github.io/something-about-linda/
 ```
 
-Comparte esa URL con Linda 💗
-
 ---
 
-## ⚠️ Nota sobre archivos grandes
-GitHub tiene límite de 100MB por archivo. Si tu video es muy grande:
-- Comprímelo con [HandBrake](https://handbrake.fr/) (gratis)
-- O súbelo a Google Drive/YouTube como "no listado" y usa un iframe
+## ⚠️ Video muy pesado
 
-Para video de YouTube/Drive, en `index.html` reemplaza el `<video>` por:
+Si el video es >50MB, mejor:
+1. Súbelo a YouTube como **"No listado"**
+2. En `index.html` reemplaza el `<video>` por:
 ```html
 <iframe
-  src="https://www.youtube.com/embed/TU_VIDEO_ID?autoplay=0"
-  frameborder="0"
-  allowfullscreen
+  src="https://www.youtube.com/embed/ID_DEL_VIDEO"
+  frameborder="0" allowfullscreen
   style="width:100%;aspect-ratio:16/9;">
 </iframe>
 ```
 
 ---
 
-## 💗 Secuencia de escenas
-
-| # | Escena | Descripción |
-|---|--------|-------------|
-| 0 | Intro | Disco de vinilo girando, título, estrellas |
-| 1 | Universo | Planeta B-612 flotante con tulipán |
-| 2 | Acertijo 1 | Coca-Cola Zero 🥤 |
-| 3 | Carta 1 | Sobre con carta de amor |
-| 4 | Pájaro de papel | La carta vuela como origami |
-| 5 | Acertijo 2 | Daft Punk 🎵 |
-| 6 | Daft Punk | Casco dorado, visor neón, letras de "Something About Us" |
-| 7 | Arthur Morgan | Diálogo con la monjita 🤠 |
-| 8 | Fotos | Polaroids con tus fotos especiales |
-| 9 | Acertijo 3 | El Principito / La frase del zorro 🦊 |
-| 10 | Video | Tu video especial para ella |
-| 11 | Propuesta | Carta final + botón "¿Quieres ser mi novia?" 💗 |
-
----
-
-¡Mucho éxito! Que ella diga que sí 🌷
+¡Mucho ánimo! Va a decir que sí 🌷💗

@@ -1,441 +1,643 @@
-/* ============================================
-   SOMETHING ABOUT LINDA — script.js
-   ============================================ */
-
+/* ============================================================
+   SOMETHING ABOUT LINDA v2 — script.js
+   ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ── Scene registry ──────────────────────────────────────
-  const scenes = [
-    "scene-intro",
-    "scene-universe",
-    "scene-riddle1",
-    "scene-letter1",
-    "scene-bird",
-    "scene-riddle2",
-    "scene-daft",
-    "scene-arthur",
-    "scene-photos",
-    "scene-riddle3",
-    "scene-video",
-    "scene-proposal"
-  ];
-  let current = 0;
+  /* ── SCENES ──────────────────────────────────────────── */
+  const SCENES = ["s0","s1","s2","s3","s4","s5","s6","s7","s8","s9","s10","s11","s12","s13","s14","s15"];
+  let cur = 0;
 
-  function goTo(index) {
-    const prev = document.getElementById(scenes[current]);
-    const next = document.getElementById(scenes[index]);
+  function goTo(idx) {
+    const prev = document.getElementById(SCENES[cur]);
     if (prev) prev.classList.remove("active");
-    current = index;
+    cur = idx;
     setTimeout(() => {
+      const next = document.getElementById(SCENES[cur]);
       if (next) {
         next.classList.add("active");
-        onEnterScene(scenes[index]);
+        onEnter(SCENES[cur]);
       }
-    }, 400);
+    }, 500);
   }
 
-  function onEnterScene(id) {
-    switch (id) {
-      case "scene-universe":   initSpaceCanvas();    break;
-      case "scene-daft":       initDaftCanvas();     break;
-      case "scene-proposal":   initConfetti(); spawnTulipShower(); break;
-      case "scene-riddle3":    spawnTulipRain();     break;
-      case "scene-arthur":     runDialogue();        break;
-    }
+  function onEnter(id) {
+    const fns = {
+      "s1":  initSpaceCanvas,
+      "s4":  initBirdScene,
+      "s5":  initSeraphineScene,
+      "s7":  initDaftCanvas,
+      "s8":  runDialogue,
+      "s12": animatePolaroids,
+      "s15": () => { initConfettiCanvas(); spawnTulipShower(); }
+    };
+    if (fns[id]) fns[id]();
   }
 
-  // ── Music ────────────────────────────────────────────────
+  /* ── MUSIC ───────────────────────────────────────────── */
   const music = document.getElementById("bg-music");
-  let musicStarted = false;
+  let musicOn = false;
   function tryMusic() {
-    if (!musicStarted) {
-      music.volume = 0.35;
-      music.play().catch(() => {});
-      musicStarted = true;
-    }
+    if (!musicOn) { music.volume = 0.32; music.play().catch(()=>{}); musicOn = true; }
   }
 
-  // ── SCENE 0: INTRO — starfield + click ──────────────────
+  /* ══════════════════════════════════════════════════════
+     SCENE 0 — INTRO
+  ══════════════════════════════════════════════════════ */
   initStarfield();
-
-  document.getElementById("scene-intro").addEventListener("click", () => {
+  document.getElementById("vinyl-big").addEventListener("click", () => {
     tryMusic();
     goTo(1);
   });
 
   function initStarfield() {
-    const canvas = document.getElementById("starfield");
-    const ctx = canvas.getContext("2d");
+    const cv = document.getElementById("c-stars");
+    const cx = cv.getContext("2d");
     let stars = [];
-
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-      stars = Array.from({ length: 180 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.5 + 0.3,
-        speed: Math.random() * 0.3 + 0.05,
-        alpha: Math.random()
+    const resize = () => {
+      cv.width = innerWidth; cv.height = innerHeight;
+      stars = Array.from({length:200}, () => ({
+        x: Math.random()*cv.width, y: Math.random()*cv.height,
+        r: Math.random()*1.4+.3, a: Math.random(), s: Math.random()*.25+.03
       }));
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
       stars.forEach(s => {
-        s.alpha += (Math.random() - 0.5) * 0.03;
-        s.alpha = Math.max(0.1, Math.min(1, s.alpha));
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 210, 230, ${s.alpha})`;
-        ctx.fill();
+        s.a += (Math.random()-.5)*.025;
+        s.a = Math.max(.05, Math.min(1,s.a));
+        cx.beginPath(); cx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        cx.fillStyle = `rgba(255,210,230,${s.a})`; cx.fill();
       });
       requestAnimationFrame(draw);
-    }
-
-    resize();
-    window.addEventListener("resize", resize);
-    draw();
+    };
+    resize(); addEventListener("resize",resize); draw();
   }
 
-  // ── SCENE 1: UNIVERSE ───────────────────────────────────
-  document.getElementById("btn-u1").addEventListener("click", () => goTo(2));
+  /* ══════════════════════════════════════════════════════
+     SCENE 1 — UNIVERSE
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-s1").addEventListener("click", () => goTo(2));
 
   function initSpaceCanvas() {
-    const canvas = document.getElementById("space-canvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let particles = [];
-
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-      particles = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.2 + 0.2,
-        alpha: Math.random() * 0.8 + 0.2,
-        speed: Math.random() * 0.2 + 0.02,
-        drift: (Math.random() - 0.5) * 0.3
-      }));
-    }
-
-    let raf;
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.y -= p.speed;
-        p.x += p.drift;
-        if (p.y < -2) { p.y = canvas.height + 2; p.x = Math.random() * canvas.width; }
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,200,230,${p.alpha})`;
-        ctx.fill();
-      });
-      raf = requestAnimationFrame(draw);
-    }
-
-    resize();
-    window.addEventListener("resize", resize);
-    draw();
-  }
-
-  // ── SCENE 2: RIDDLE 1 ───────────────────────────────────
-  setupRiddle("riddle1-opts", "r1-ok", "r1-wrong", "btn-r1", 3);
-
-  document.getElementById("btn-r1").addEventListener("click", () => goTo(3));
-
-  // ── SCENE 3: LETTER 1 ───────────────────────────────────
-  const env1    = document.getElementById("env1");
-  const envFront = env1.querySelector(".envelope-front");
-  const paper1  = document.getElementById("letter1-paper");
-
-  env1.addEventListener("click", () => {
-    if (paper1.classList.contains("hidden")) {
-      envFront.style.display = "none";
-      paper1.classList.remove("hidden");
-    }
-  });
-
-  document.getElementById("btn-l1").addEventListener("click", () => goTo(4));
-
-  // ── SCENE 4: BIRD ───────────────────────────────────────
-  document.getElementById("btn-bird").addEventListener("click", () => {
-    launchBird();
-    setTimeout(() => goTo(5), 1800);
-  });
-
-  function launchBird() {
-    const wrap = document.getElementById("paper-bird-wrap");
-    wrap.style.transition = "transform 1.8s cubic-bezier(0.3,0,0.5,1), opacity 1.8s ease";
-    wrap.style.transform  = "translate(60vw, -60vh) scale(0.3) rotate(30deg)";
-    wrap.style.opacity    = "0";
-  }
-
-  // ── SCENE 5: RIDDLE 2 ───────────────────────────────────
-  setupRiddle("riddle2-opts", "r2-ok", "r2-wrong", "btn-r2", 6);
-
-  document.getElementById("btn-r2").addEventListener("click", () => goTo(6));
-
-  // ── SCENE 6: DAFT PUNK ──────────────────────────────────
-  document.getElementById("btn-daft").addEventListener("click", () => goTo(7));
-
-  function initDaftCanvas() {
-    const canvas = document.getElementById("daft-canvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    const dots = Array.from({ length: 60 }, () => ({
-      x: Math.random(), y: Math.random(),
-      vx: (Math.random() - 0.5) * 0.001,
-      vy: (Math.random() - 0.5) * 0.001,
-      hue: Math.random() * 80 + 280 // purple-pink
+    const cv = document.getElementById("c-space"); if (!cv) return;
+    const cx = cv.getContext("2d");
+    const resize = () => { cv.width = innerWidth; cv.height = innerHeight; };
+    const pts = Array.from({length:130}, () => ({
+      x:Math.random(), y:Math.random(),
+      vx:(Math.random()-.5)*.0008, vy:(Math.random()-.5)*.0008,
+      a:Math.random()*.7+.2, r:Math.random()*.9+.2
     }));
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      dots.forEach(d => {
-        d.x = (d.x + d.vx + 1) % 1;
-        d.y = (d.y + d.vy + 1) % 1;
-        const px = d.x * canvas.width;
-        const py = d.y * canvas.height;
-        ctx.beginPath();
-        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${d.hue}, 80%, 70%, 0.5)`;
-        ctx.fill();
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.x=(p.x+p.vx+1)%1; p.y=(p.y+p.vy+1)%1;
+        cx.beginPath(); cx.arc(p.x*cv.width,p.y*cv.height,p.r,0,Math.PI*2);
+        cx.fillStyle=`rgba(255,200,230,${p.a})`; cx.fill();
       });
       requestAnimationFrame(draw);
-    }
-
-    resize();
-    window.addEventListener("resize", resize);
-    draw();
+    };
+    resize(); addEventListener("resize",resize); draw();
   }
 
-  // ── SCENE 7: ARTHUR DIALOGUE ────────────────────────────
-  document.getElementById("btn-arthur").addEventListener("click", () => goTo(8));
+  /* ══════════════════════════════════════════════════════
+     SCENE 2 — RIDDLE 1
+  ══════════════════════════════════════════════════════ */
+  setupRiddle("r1-opts","r1-pos","r1-neg","btn-s2");
+  document.getElementById("btn-s2").addEventListener("click", () => goTo(3));
 
-  function runDialogue() {
-    const ab1 = document.getElementById("ab1");
-    const nb1 = document.getElementById("nb1");
-    const ab2 = document.getElementById("ab2");
-    const nb2 = document.getElementById("nb2");
-    const btn = document.getElementById("btn-arthur");
+  /* ══════════════════════════════════════════════════════
+     SCENE 3 — LETTER 1
+  ══════════════════════════════════════════════════════ */
+  setupEnvelope("env-s3","env-s3-cover","env-s3-letter");
+  document.getElementById("btn-s3").addEventListener("click", () => goTo(4));
 
-    // Reset visibility
-    [nb1, ab2, nb2, btn].forEach(el => el.classList.add("hidden"));
-    ab1.classList.remove("hidden");
+  /* ══════════════════════════════════════════════════════
+     SCENE 4 — BIRD + NEW PLANET
+  ══════════════════════════════════════════════════════ */
+  function initBirdScene() {
+    const birdScene   = document.getElementById("bird-scene");
+    const birdSVG     = document.getElementById("paper-bird");
+    const birdPrompt  = document.getElementById("bird-prompt");
+    const birdSub     = document.getElementById("bird-sub");
+    const birdBtn     = document.getElementById("btn-bird-go");
+    const newPlanet   = document.getElementById("new-planet-scene");
 
-    setTimeout(() => nb1.classList.remove("hidden"), 2200);
-    setTimeout(() => ab2.classList.remove("hidden"), 4500);
-    setTimeout(() => nb2.classList.remove("hidden"), 6800);
-    setTimeout(() => btn.classList.remove("hidden"), 9000);
+    // Reset state
+    birdSVG.style.transform = "";
+    birdSVG.style.opacity   = "1";
+    birdSVG.style.transition = "";
+    birdScene.classList.remove("hidden");
+    newPlanet.classList.add("hidden");
+
+    // Show sub-text and button after delay
+    setTimeout(() => birdSub.classList.remove("hidden"), 1800);
+    setTimeout(() => birdBtn.classList.remove("hidden"), 2800);
+
+    // Sky canvas
+    initBirdSkyCanvas();
   }
 
-  // ── SCENE 8: PHOTOS ─────────────────────────────────────
-  document.getElementById("btn-photos").addEventListener("click", () => goTo(9));
+  document.getElementById("btn-bird-go").addEventListener("click", () => {
+    const birdSVG   = document.getElementById("paper-bird");
+    const birdScene = document.getElementById("bird-scene");
+    const newPlanet = document.getElementById("new-planet-scene");
 
-  // ── SCENE 9: RIDDLE 3 ───────────────────────────────────
-  setupRiddle("riddle3-opts", "r3-ok", "r3-wrong", "btn-r3", 10);
+    // Bird flies across the screen
+    birdSVG.style.transition = "transform 2s cubic-bezier(.3,0,.4,1), opacity 2s ease";
+    birdSVG.style.transform  = "translate(55vw,-65vh) scale(0.2) rotate(25deg)";
+    birdSVG.style.opacity    = "0.1";
 
-  document.getElementById("btn-r3").addEventListener("click", () => goTo(10));
+    setTimeout(() => {
+      birdScene.classList.add("hidden");
+      newPlanet.classList.remove("hidden");
+      initNewPlanetCanvas();
+    }, 1800);
+  });
 
-  function spawnTulipRain() {
-    const container = document.getElementById("tulip-rain");
-    if (!container) return;
-    container.innerHTML = "";
-    for (let i = 0; i < 18; i++) {
+  document.getElementById("btn-s4").addEventListener("click", () => goTo(5));
+
+  function initBirdSkyCanvas() {
+    const cv = document.getElementById("c-bird-sky"); if (!cv) return;
+    const cx = cv.getContext("2d");
+    const resize = () => { cv.width=innerWidth; cv.height=innerHeight; };
+    const pts = Array.from({length:80},()=>({
+      x:Math.random()*100, y:Math.random()*100,
+      r:Math.random()*1.5+.5, a:Math.random()*.8+.2
+    }));
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.a += (Math.random()-.5)*.02; p.a=Math.max(.1,Math.min(.9,p.a));
+        cx.beginPath(); cx.arc(p.x/100*cv.width, p.y/100*cv.height, p.r,0,Math.PI*2);
+        cx.fillStyle=`rgba(255,180,230,${p.a})`; cx.fill();
+      });
+      requestAnimationFrame(draw);
+    };
+    resize(); addEventListener("resize",resize); draw();
+  }
+
+  function initNewPlanetCanvas() {
+    const cv = document.getElementById("c-new-planet"); if (!cv) return;
+    const cx = cv.getContext("2d");
+    const resize = () => { cv.width=innerWidth; cv.height=innerHeight; };
+    const pts = Array.from({length:120},()=>({
+      x:Math.random(), y:Math.random(),
+      vx:(Math.random()-.5)*.0006, vy:(Math.random()-.5)*.0006,
+      a:Math.random()*.7+.2, r:Math.random()*.9+.2,
+      hue:Math.random()*60+270
+    }));
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.x=(p.x+p.vx+1)%1; p.y=(p.y+p.vy+1)%1;
+        cx.beginPath(); cx.arc(p.x*cv.width,p.y*cv.height,p.r,0,Math.PI*2);
+        cx.fillStyle=`hsla(${p.hue},80%,80%,${p.a})`; cx.fill();
+      });
+      requestAnimationFrame(draw);
+    };
+    resize(); addEventListener("resize",resize); draw();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 5 — SERAPHINE
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-s5").addEventListener("click", () => goTo(6));
+
+  function initSeraphineScene() {
+    spawnSeraphineElements();
+    initSeraCanvas();
+  }
+
+  function spawnSeraphineElements() {
+    // Petals
+    const petalCont = document.getElementById("sera-petals");
+    if (!petalCont) return;
+    petalCont.innerHTML = "";
+    const emojis = ["🌸","🌷","✨","💜","🎵"];
+    for (let i = 0; i < 20; i++) {
       setTimeout(() => {
         const el = document.createElement("div");
-        el.className = "tulip-fall";
-        el.textContent = "🌷";
-        el.style.left     = Math.random() * 100 + "vw";
-        el.style.fontSize = (Math.random() * 1.2 + 0.8) + "rem";
-        el.style.opacity  = (Math.random() * 0.4 + 0.3).toString();
-        const dur = Math.random() * 4 + 5;
-        el.style.animationDuration = dur + "s";
-        container.appendChild(el);
-        setTimeout(() => el.remove(), dur * 1000);
-      }, i * 600);
+        el.className = "petal";
+        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        el.style.left = Math.random()*100 + "%";
+        el.style.top  = "-40px";
+        const rot = (Math.random()-0.5)*720;
+        el.style.setProperty("--pr", rot+"deg");
+        const dur = Math.random()*4+4;
+        el.style.animationDuration = dur+"s";
+        petalCont.appendChild(el);
+        setTimeout(()=>el.remove(), dur*1000+200);
+      }, i*400);
+    }
+
+    // Musical notes
+    const noteCont = document.getElementById("sera-notes");
+    if (!noteCont) return;
+    noteCont.innerHTML = "";
+    const notes = ["♪","♫","🎵","♩"];
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const el = document.createElement("div");
+        el.style.cssText = `
+          position:absolute; font-size:${Math.random()*.8+.8}rem;
+          left:${Math.random()*80+10}%;
+          top:${Math.random()*80+10}%;
+          pointer-events:none;
+          --nx: ${(Math.random()-0.5)*120}px;
+          --ny: ${-(Math.random()*80+40)}px;
+          animation: note-fly 2s ease forwards;
+        `;
+        el.textContent = notes[Math.floor(Math.random()*notes.length)];
+        noteCont.appendChild(el);
+        setTimeout(()=>el.remove(),2100);
+      }, i*500);
     }
   }
 
-  // ── SCENE 10: VIDEO ─────────────────────────────────────
-  // Show placeholder if no real video file
+  function initSeraCanvas() {
+    const cv = document.getElementById("c-sera"); if (!cv) return;
+    const cx = cv.getContext("2d");
+    const resize = () => { cv.width=innerWidth; cv.height=innerHeight; };
+    const pts = Array.from({length:80},()=>({
+      x:Math.random(), y:Math.random(),
+      vx:(Math.random()-.5)*.0007, vy:(Math.random()-.5)*.0007,
+      hue:Math.random()*60+240, a:.4+Math.random()*.5, r:.5+Math.random()*1.2
+    }));
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.x=(p.x+p.vx+1)%1; p.y=(p.y+p.vy+1)%1;
+        cx.beginPath(); cx.arc(p.x*cv.width,p.y*cv.height,p.r,0,Math.PI*2);
+        cx.fillStyle=`hsla(${p.hue},70%,80%,${p.a})`; cx.fill();
+      });
+      requestAnimationFrame(draw);
+    };
+    resize(); addEventListener("resize",resize); draw();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 6 — RIDDLE 2
+  ══════════════════════════════════════════════════════ */
+  setupRiddle("r2-opts","r2-pos","r2-neg","btn-s6");
+  document.getElementById("btn-s6").addEventListener("click", () => goTo(7));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 7 — DAFT PUNK
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-s7").addEventListener("click", () => goTo(8));
+
+  function initDaftCanvas() {
+    const cv = document.getElementById("c-daft"); if (!cv) return;
+    const cx = cv.getContext("2d");
+    const resize = () => { cv.width=innerWidth; cv.height=innerHeight; };
+    const pts = Array.from({length:60},()=>({
+      x:Math.random(), y:Math.random(),
+      vx:(Math.random()-.5)*.001, vy:(Math.random()-.5)*.001,
+      hue:Math.random()*80+280, r:1+Math.random()*1.5
+    }));
+    const draw = () => {
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach(p => {
+        p.x=(p.x+p.vx+1)%1; p.y=(p.y+p.vy+1)%1;
+        cx.beginPath(); cx.arc(p.x*cv.width,p.y*cv.height,p.r,0,Math.PI*2);
+        cx.fillStyle=`hsla(${p.hue},80%,70%,.45)`; cx.fill();
+      });
+      requestAnimationFrame(draw);
+    };
+    resize(); addEventListener("resize",resize); draw();
+  }
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 8 — ARTHUR DIALOGUE
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-s8").addEventListener("click", () => goTo(9));
+
+  function runDialogue() {
+    const ids = ["d1","d2","d3","d4","d5"];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.add("hidden"); }
+    });
+    document.getElementById("btn-s8").classList.add("hidden");
+
+    document.getElementById("d1").classList.remove("hidden");
+    const delays = [2200, 4500, 6800, 9100, 11200, 13000];
+    ["d2","d3","d4","d5"].forEach((id,i) => {
+      setTimeout(() => document.getElementById(id).classList.remove("hidden"), delays[i]);
+    });
+    setTimeout(() => document.getElementById("btn-s8").classList.remove("hidden"), delays[4]);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 9 — GASTRONOMY
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-s9").addEventListener("click", () => goTo(10));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 10 — LETTER 2
+  ══════════════════════════════════════════════════════ */
+  setupEnvelope("env-s10","env-s10-cover","env-s10-letter");
+  document.getElementById("btn-s10").addEventListener("click", () => goTo(11));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 11 — RIDDLE 3
+  ══════════════════════════════════════════════════════ */
+  setupRiddle("r3-opts","r3-pos","r3-neg","btn-s11");
+  document.getElementById("btn-s11").addEventListener("click", () => goTo(12));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 12 — PHOTOS WITH LETTER MODAL
+  ══════════════════════════════════════════════════════ */
+  /*
+    ─────────────────────────────────────────────────────────
+    PHOTO DATA — personaliza cada entrada:
+      img:     ruta a tu foto (ej: "fotos/foto1.jpg") o "" para placeholder
+      tag:     título de la carta
+      body:    texto de la carta para esa foto
+    ─────────────────────────────────────────────────────────
+  */
+  const PHOTO_DATA = {
+    p1: {
+      img: "",
+      tag: "✦ Carta — El momento que más recuerdo",
+      body: "[ Escribe aquí lo que esta foto significa para ti, qué pasó ese día, por qué la guardas y qué sientes cada vez que la ves. ]"
+    },
+    p2: {
+      img: "",
+      tag: "✦ Carta — Tu risa",
+      body: "[ Escribe aquí por qué esta foto captura algo que amas de ella. ]"
+    },
+    p3: {
+      img: "",
+      tag: "✦ Carta — Lo que admiro aquí",
+      body: "[ Tu historia para esta foto. ]"
+    },
+    p4: {
+      img: "",
+      tag: "✦ Carta — Un momento tuyo favorito",
+      body: "[ Tu historia para esta foto. ]"
+    },
+    p5: {
+      img: "",
+      tag: "✦ Carta — Lo que ella no sabe",
+      body: "[ Tu historia para esta foto. ]"
+    },
+    p6: {
+      img: "",
+      tag: "✦ Carta — Promesa",
+      body: "[ Tu historia para esta foto. ]"
+    }
+  };
+
+  function animatePolaroids() {
+    document.querySelectorAll(".polaroid").forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.animation = `fadeUp .7s ease forwards`;
+      el.style.animationDelay = (i * 0.18) + "s";
+    });
+  }
+
+  const modal    = document.getElementById("photo-modal");
+  const overlay  = document.getElementById("pm-overlay");
+  const pmImg    = document.getElementById("pm-img");
+  const pmTag    = document.getElementById("pm-tag");
+  const pmBody   = document.getElementById("pm-body");
+  const pmClose  = document.getElementById("pm-close");
+
+  document.getElementById("polaroid-grid").addEventListener("click", e => {
+    const pol = e.target.closest(".polaroid");
+    if (!pol) return;
+    const id   = pol.dataset.id;
+    const data = PHOTO_DATA[id];
+    if (!data) return;
+
+    // Set image
+    pmImg.innerHTML = "";
+    if (data.img) {
+      const img = document.createElement("img");
+      img.src = data.img;
+      img.alt = "foto";
+      pmImg.classList.remove("placeholder-lg");
+      pmImg.appendChild(img);
+    } else {
+      pmImg.classList.add("placeholder-lg");
+      pmImg.innerHTML = "<span>📷</span>";
+    }
+
+    pmTag.textContent  = data.tag;
+    pmBody.textContent = data.body;
+    modal.classList.remove("hidden");
+  });
+
+  pmClose.addEventListener("click", () => modal.classList.add("hidden"));
+  overlay.addEventListener("click", () => modal.classList.add("hidden"));
+
+  document.getElementById("btn-s12").addEventListener("click", () => goTo(13));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 13 — SECRET MESSAGE ENVELOPES
+  ══════════════════════════════════════════════════════ */
+  const secretEnvs   = document.querySelectorAll(".secret-env");
+  const revealDiv    = document.getElementById("secret-reveal");
+  const srMsg        = document.getElementById("sr-msg");
+  const btnS13       = document.getElementById("btn-s13");
+  let openedWords    = [];
+
+  secretEnvs.forEach(env => {
+    env.addEventListener("click", () => {
+      const front = env.querySelector(".se-front");
+      const back  = env.querySelector(".se-back");
+      const word  = env.dataset.word;
+      const order = parseInt(env.dataset.order);
+
+      if (back.classList.contains("hidden")) {
+        front.classList.add("hidden");
+        back.classList.remove("hidden");
+
+        // Record word in order
+        openedWords[order-1] = word;
+
+        // Check if all opened
+        const totalEnvs = secretEnvs.length;
+        const allOpen   = Array.from(secretEnvs).every(e => !e.querySelector(".se-back").classList.contains("hidden"));
+
+        if (allOpen) {
+          const msg = openedWords.filter(Boolean).join(" ");
+          srMsg.textContent = msg;
+          setTimeout(() => {
+            revealDiv.classList.remove("hidden");
+            setTimeout(() => btnS13.classList.remove("hidden"), 1200);
+          }, 600);
+        }
+      }
+    });
+  });
+
+  document.getElementById("btn-s13").addEventListener("click", () => goTo(14));
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 14 — VIDEO
+  ══════════════════════════════════════════════════════ */
   const videoEl = document.getElementById("main-video");
-  const videoPlaceholder = document.getElementById("video-placeholder");
+  const videoPh = document.getElementById("video-ph");
 
   videoEl.addEventListener("error", () => {
     videoEl.style.display = "none";
-    if (videoPlaceholder) videoPlaceholder.style.display = "flex";
+    if (videoPh) videoPh.style.display = "flex";
   });
-
-  // If src is placeholder, just show placeholder
-  if (!videoEl.src || videoEl.src.includes("tu-video-aqui")) {
+  if (!videoEl.currentSrc || videoEl.currentSrc.includes("tu-video-aqui")) {
     videoEl.style.display = "none";
-    if (videoPlaceholder) videoPlaceholder.style.display = "flex";
+    if (videoPh) videoPh.style.display = "flex";
   }
 
-  document.getElementById("btn-video").addEventListener("click", () => goTo(11));
+  document.getElementById("btn-s14").addEventListener("click", () => goTo(15));
 
-  // ── SCENE 11: PROPOSAL ──────────────────────────────────
-  const btnYes = document.getElementById("btn-yes");
-  const btnNo  = document.getElementById("btn-no");
-  const responseDiv = document.getElementById("response-yes");
-
-  btnYes.addEventListener("click", () => {
-    document.getElementById("proposal-btns").style.display = "none";
-    responseDiv.classList.remove("hidden");
+  /* ══════════════════════════════════════════════════════
+     SCENE 15 — PROPOSAL
+  ══════════════════════════════════════════════════════ */
+  document.getElementById("btn-yes").addEventListener("click", () => {
+    document.getElementById("prop-btns").style.display = "none";
+    document.getElementById("prop-response").classList.remove("hidden");
     burstConfetti();
-    spawnHeartExplosion();
+    spawnHearts();
+    // Keep tulip shower going
   });
 
-  // "No" button runs away
-  btnNo.addEventListener("mouseenter", () => {
-    const btn = btnNo;
-    const maxX = window.innerWidth  - 100;
-    const maxY = window.innerHeight - 50;
-    const rx = Math.floor(Math.random() * maxX);
-    const ry = Math.floor(Math.random() * maxY);
-    btn.style.position = "fixed";
-    btn.style.left = rx + "px";
-    btn.style.top  = ry + "px";
-    btn.style.zIndex = "9999";
-    btn.style.transition = "left 0.3s ease, top 0.3s ease";
-  });
+  // "No" button runs away from cursor
+  const btnNo = document.getElementById("btn-no");
+  btnNo.addEventListener("mouseenter", runAway);
+  btnNo.addEventListener("touchstart", runAway, {passive:true});
 
-  // ── CONFETTI ────────────────────────────────────────────
-  function initConfetti() {
-    const canvas = document.getElementById("confetti-canvas");
-    if (!canvas) return;
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
+  function runAway() {
+    const maxX = innerWidth  - 120;
+    const maxY = innerHeight - 60;
+    const nx   = Math.floor(Math.random() * maxX);
+    const ny   = Math.floor(Math.random() * maxY);
+    btnNo.style.left = nx + "px";
+    btnNo.style.top  = ny + "px";
+  }
+  // Initialize button position
+  btnNo.style.left = "60%";
+  btnNo.style.top  = "72%";
+
+  /* ── CONFETTI ──────────────────────────────────────── */
+  function initConfettiCanvas() {
+    const cv = document.getElementById("c-confetti");
+    if (!cv) return;
+    cv.width = innerWidth; cv.height = innerHeight;
   }
 
-  let confettiActive = false;
   function burstConfetti() {
-    const canvas = document.getElementById("confetti-canvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const colors = ["#ff69b4","#ffb6d9","#ff1493","#ffc0cb","#ff85c0","#ffffff","#ffd6eb"];
-    const particles = Array.from({ length: 120 }, () => ({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      vx: (Math.random() - 0.5) * 14,
-      vy: (Math.random() - 0.5) * 14 - 4,
-      r: Math.random() * 8 + 4,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      rotation: Math.random() * Math.PI * 2,
-      rotSpeed: (Math.random() - 0.5) * 0.2,
-      gravity: 0.25,
-      alpha: 1
+    const cv  = document.getElementById("c-confetti"); if (!cv) return;
+    const cx  = cv.getContext("2d");
+    cv.width  = innerWidth; cv.height = innerHeight;
+    const colors = ["#ff69b4","#ffb6d9","#ff1493","#ffc0cb","#ff85c0","#fff","#ffd6eb","#c060ff"];
+    const pts = Array.from({length:150}, () => ({
+      x:cv.width/2, y:cv.height*.6,
+      vx:(Math.random()-.5)*16, vy:(Math.random()-.5)*14-5,
+      r:Math.random()*8+3,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*Math.PI*2, rs:(Math.random()-.5)*.18,
+      g:.28, a:1
     }));
 
-    confettiActive = true;
     function draw() {
-      if (!confettiActive) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      cx.clearRect(0,0,cv.width,cv.height);
       let alive = false;
-      particles.forEach(p => {
-        p.vy += p.gravity;
-        p.x  += p.vx;
-        p.y  += p.vy;
-        p.rotation += p.rotSpeed;
-        p.alpha -= 0.008;
-        if (p.alpha > 0) alive = true;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2);
-        ctx.restore();
+      pts.forEach(p => {
+        p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.rs; p.a-=.007;
+        if (p.a>0) alive=true;
+        cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+        cx.globalAlpha=Math.max(0,p.a); cx.fillStyle=p.color;
+        cx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); cx.restore();
       });
       if (alive) requestAnimationFrame(draw);
-      else ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     draw();
   }
 
   function spawnTulipShower() {
-    const container = document.getElementById("tulip-shower");
-    if (!container) return;
-    container.innerHTML = "";
-
-    for (let i = 0; i < 30; i++) {
+    const cont = document.getElementById("tulip-shower"); if (!cont) return;
+    cont.innerHTML = "";
+    for (let i=0; i<35; i++) {
       setTimeout(() => {
         const el = document.createElement("div");
         el.className = "tulip-fall";
-        el.textContent = i % 3 === 0 ? "💗" : "🌷";
-        el.style.left     = Math.random() * 100 + "vw";
-        el.style.fontSize = (Math.random() * 1.5 + 1) + "rem";
-        const dur = Math.random() * 5 + 4;
-        el.style.animationDuration = dur + "s";
-        container.appendChild(el);
-        setTimeout(() => el.remove(), dur * 1000 + 500);
-      }, i * 300);
+        el.textContent = i%3===0 ? "💗" : "🌷";
+        el.style.left = Math.random()*100+"vw";
+        el.style.fontSize = (Math.random()*1.4+.9)+"rem";
+        const dur = Math.random()*5+4;
+        el.style.animationDuration = dur+"s";
+        cont.appendChild(el);
+        setTimeout(()=>el.remove(), dur*1000+300);
+      }, i*280);
     }
   }
 
-  function spawnHeartExplosion() {
-    for (let i = 0; i < 18; i++) {
+  function spawnHearts() {
+    for (let i=0; i<22; i++) {
       const el = document.createElement("div");
       el.style.cssText = `
         position:fixed;
-        font-size:${Math.random()*1.5+1}rem;
+        font-size:${Math.random()*1.5+.9}rem;
         left:${Math.random()*100}vw;
-        top:${Math.random()*40+30}vh;
-        pointer-events:none;
-        z-index:9998;
+        top:${Math.random()*50+20}vh;
+        pointer-events:none; z-index:9998;
         animation: fall-tulip ${Math.random()*3+2}s linear forwards;
       `;
       el.textContent = "💗";
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 5000);
+      setTimeout(()=>el.remove(), 5000);
     }
   }
 
-  // ── RIDDLE HELPER ────────────────────────────────────────
-  function setupRiddle(optsId, okId, wrongId, nextBtnId, nextScene) {
-    const opts    = document.getElementById(optsId);
-    const okEl    = document.getElementById(okId);
-    const wrongEl = document.getElementById(wrongId);
-    const nextBtn = document.getElementById(nextBtnId);
-
+  /* ══════════════════════════════════════════════════════
+     HELPERS
+  ══════════════════════════════════════════════════════ */
+  function setupRiddle(optsId, posId, negId, btnId) {
+    const opts  = document.getElementById(optsId);
+    const posEl = document.getElementById(posId);
+    const negEl = document.getElementById(negId);
+    const btn   = document.getElementById(btnId);
     if (!opts) return;
 
-    opts.querySelectorAll(".riddle-opt").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const isCorrect = btn.dataset.correct === "true";
-        opts.querySelectorAll(".riddle-opt").forEach(b => b.disabled = true);
-
-        if (isCorrect) {
-          btn.classList.add("correct");
-          okEl.classList.remove("hidden");
-          wrongEl.classList.add("hidden");
-          setTimeout(() => nextBtn.classList.remove("hidden"), 900);
+    opts.querySelectorAll(".r-opt").forEach(b => {
+      b.addEventListener("click", () => {
+        const ok = b.dataset.ok === "true";
+        opts.querySelectorAll(".r-opt").forEach(x => x.disabled=true);
+        if (ok) {
+          b.classList.add("correct");
+          posEl.classList.remove("hidden");
+          negEl.classList.add("hidden");
+          setTimeout(()=>btn.classList.remove("hidden"), 900);
         } else {
-          btn.classList.add("wrong-pick");
-          wrongEl.classList.remove("hidden");
-          okEl.classList.add("hidden");
-          setTimeout(() => {
-            opts.querySelectorAll(".riddle-opt").forEach(b => {
-              b.disabled = false;
-              b.classList.remove("wrong-pick");
-            });
-            wrongEl.classList.add("hidden");
-          }, 1400);
+          b.classList.add("wrong-pick");
+          negEl.classList.remove("hidden");
+          posEl.classList.add("hidden");
+          setTimeout(()=>{
+            opts.querySelectorAll(".r-opt").forEach(x=>{ x.disabled=false; x.classList.remove("wrong-pick"); });
+            negEl.classList.add("hidden");
+          },1400);
         }
       });
     });
   }
 
-});
+  function setupEnvelope(wrapId, coverId, letterId) {
+    const wrap   = document.getElementById(wrapId);
+    const cover  = document.getElementById(coverId);
+    const letter = document.getElementById(letterId);
+    if (!wrap) return;
+    wrap.addEventListener("click", () => {
+      if (wrap.dataset.opened === "false") {
+        wrap.dataset.opened = "true";
+        cover.style.animation = "fadeUp .4s ease reverse forwards";
+        setTimeout(()=>{
+          cover.classList.add("hidden");
+          letter.classList.remove("hidden");
+        }, 350);
+      }
+    });
+  }
+
+}); // end DOMContentLoaded
