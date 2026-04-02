@@ -17,9 +17,11 @@
   <div class="intro-wrap">
     <div class="vinyl-big" id="vinyl-big">
       <div class="vinyl-label">
-        <p class="vinyl-track">Something About</p>
-        <p class="vinyl-name">Linda</p>
-        <p class="vinyl-sub">💗</p>
+        <div class="vinyl-label-inner">
+          <p class="vinyl-track">Something About</p>
+          <p class="vinyl-name">Linda</p>
+          <p class="vinyl-sub">💗</p>
+        </div>
       </div>
       <div class="vinyl-groove g1"></div>
       <div class="vinyl-groove g2"></div>
@@ -217,7 +219,22 @@
     <div class="dia-row center hidden" id="d5">
       <div class="bubble narrator">Y Arthur supo que tenía razón.</div>
     </div>
-    <button class="btn-ghost hidden" id="btn-s8">Ella también lo supo →</button>
+    <button class="btn-ghost hidden" id="btn-s8">A ella le pasa igual →</button>
+  </div>
+</section>
+
+<!-- ░░░ ESCENA 8b: MINI-JUEGO DE COCINA ░░░ -->
+<section id="s8b" class="scene">
+  <div class="bg-kitchen"></div>
+  <div class="cooking-scene">
+    <h2 class="cook-title">🍳 El reto del chef</h2>
+    <p class="cook-sub">¿Puedes armar el platillo mexicano perfecto como lo haría Linda?</p>
+    <div id="cooking-step"></div>
+    <div id="cooking-result" class="cook-result hidden">
+      <div class="cook-dish">🌮✨</div>
+      <p class="cook-result-text">¡Platillo completado!<br>Pero el secreto de Linda no es solo la receta…<br><em>es el amor que le pone a cada cosa que hace.</em></p>
+    </div>
+    <button class="btn-ghost hidden" id="btn-s8b">Seguir el viaje →</button>
   </div>
 </section>
 
@@ -289,7 +306,27 @@
     </div>
     <p class="r-fb pos hidden" id="r3-pos">💗 Exacto. Y yo… ya soy feliz mucho antes de verte.</p>
     <p class="r-fb neg hidden" id="r3-neg">Lo sabes de memoria 😌</p>
-    <button class="btn-ghost hidden" id="btn-s11">Siguiente →</button>
+    <button class="btn-ghost hidden" id="btn-s11">Conoce al zorro →</button>
+  </div>
+</section>
+
+<!-- ░░░ ESCENA 11b: EL ZORRO Y LA FRASE ░░░ -->
+<section id="s11b" class="scene">
+  <div class="bg-cosmos"></div>
+  <div class="fox-scene">
+    <div class="fox-planet">
+      <div class="fox-planet-core"></div>
+      <div class="fox-emoji" id="fox-emoji">🦊</div>
+    </div>
+    <div class="fox-text">
+      <p class="fox-line" style="--d:.5s">"Solo se ve bien con el corazón.</p>
+      <p class="fox-line" style="--d:1.9s">Lo esencial es invisible a los ojos."</p>
+      <p class="fox-line fox-pause" style="--d:3.3s">…</p>
+      <p class="fox-line fox-big" style="--d:4.7s">"Antes de que sean las cuatro,</p>
+      <p class="fox-line fox-big" style="--d:5.8s">ya soy feliz desde las tres."</p>
+      <p class="fox-line fox-personal" style="--d:7.2s">Yo también, Linda.<br>Contigo, cada día empieza feliz.</p>
+      <button class="btn-ghost hidden" id="btn-s11b" style="margin-top:1.5rem">Continuar →</button>
+    </div>
   </div>
 </section>
 
@@ -449,6 +486,10 @@
   <div class="proposal-scene">
     <div class="proposal-card" id="proposal-card">
       <div class="prop-header">🌷 Para Linda 🌷</div>
+      <div class="day-counter">
+        <span class="dc-num" id="day-counter-num">0</span>
+        <span class="dc-label">días desde que empezaste a importarme</span>
+      </div>
       <div class="prop-body">
         <p>
           No sé escribir poesía. No soy el principito,
@@ -491,6 +532,24 @@
     </div>
   </div>
 </section>
+
+<!-- Easter Egg — Aparece al hacer click en el día contador -->
+<div class="easter-modal hidden" id="easter-modal">
+  <div class="easter-overlay" id="easter-overlay"></div>
+  <div class="easter-content">
+    <p class="easter-title">🎉 Productos aprobados por el endocrinólogo imaginario de Linda</p>
+    <div class="easter-items">
+      <div class="ei">🥤<span>Coca-Cola Zero</span><small>azúcar: 0g ✓</small></div>
+      <div class="ei">🍫<span>Chocolate de leche</span><small>"es necesario para el alma"</small></div>
+      <div class="ei">🍜<span>Maruchan habanero</span><small>colesterol: sí, pero felicidad: sí</small></div>
+      <div class="ei">🌶️<span>Buldak x2</span><small>triglicéridos: 📈 corazón: ❤️‍🔥</small></div>
+      <div class="ei">☕<span>Latte de caramelo</span><small>glucosa: chill, tú lo mereces</small></div>
+      <div class="ei">🍟<span>Lays picantes</span><small>examen de colesterol: mañana</small></div>
+    </div>
+    <p class="easter-note"><em>* Disclaimer: ningún endocrinólogo real aprobó este menú.<br>Pero el amor sí.</em></p>
+    <button class="btn-ghost dark" id="easter-close">Cerrar con culpa ✕</button>
+  </div>
+</div>
 
 <!-- Audio -->
 <audio id="bg-music" loop>

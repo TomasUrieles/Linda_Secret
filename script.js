@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ── SCENES ──────────────────────────────────────────── */
-  const SCENES = ["s0","s1","s2","s3","s4","s5","s6","s7","s8","s9","s10","s11","s12","s13","s14","s15"];
+  const SCENES = ["s0","s1","s2","s3","s4","s5","s6","s7","s8","s8b","s9","s10","s11","s11b","s12","s13","s14","s15"];
   let cur = 0;
 
   function goTo(idx) {
@@ -22,13 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function onEnter(id) {
     const fns = {
-      "s1":  initSpaceCanvas,
-      "s4":  initBirdScene,
-      "s5":  initSeraphineScene,
-      "s7":  initDaftCanvas,
-      "s8":  runDialogue,
-      "s12": animatePolaroids,
-      "s15": () => { initConfettiCanvas(); spawnTulipShower(); }
+      "s1":   initSpaceCanvas,
+      "s4":   initBirdScene,
+      "s5":   initSeraphineScene,
+      "s7":   initDaftCanvas,
+      "s8":   runDialogue,
+      "s8b":  initCookingGame,
+      "s11b": initFoxScene,
+      "s12":  animatePolaroids,
+      "s15":  () => { initConfettiCanvas(); spawnTulipShower(); initDayCounter(); }
     };
     if (fns[id]) fns[id]();
   }
@@ -310,7 +312,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ══════════════════════════════════════════════════════
      SCENE 8 — ARTHUR DIALOGUE
   ══════════════════════════════════════════════════════ */
-  document.getElementById("btn-s8").addEventListener("click", () => goTo(9));
+  document.getElementById("btn-s8").addEventListener("click", () => goTo(9)); // → cooking game (s8b)
+  // btn-s8 actually now goes to s8b (cooking game) - updated below
 
   function runDialogue() {
     const ids = ["d1","d2","d3","d4","d5"];
@@ -320,33 +323,141 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.getElementById("btn-s8").classList.add("hidden");
 
-    document.getElementById("d1").classList.remove("hidden");
-    const delays = [2200, 4500, 6800, 9100, 11200, 13000];
-    ["d2","d3","d4","d5"].forEach((id,i) => {
-      setTimeout(() => document.getElementById(id).classList.remove("hidden"), delays[i]);
-    });
-    setTimeout(() => document.getElementById("btn-s8").classList.remove("hidden"), delays[4]);
+    // Typewriter effect per bubble
+    function typewriterBubble(id, delay) {
+      setTimeout(() => {
+        const row = document.getElementById(id);
+        if (!row) return;
+        row.classList.remove("hidden");
+        const bubble = row.querySelector(".bubble");
+        if (!bubble) return;
+        const original = bubble.innerHTML;
+        bubble.innerHTML = "";
+        bubble.style.minHeight = "3em";
+        let i = 0;
+        const chars = original;
+        // Strip HTML for typewriter, then restore
+        const txt = chars.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "");
+        const interval = setInterval(() => {
+          bubble.textContent = txt.slice(0, i);
+          i++;
+          if (i > txt.length) { clearInterval(interval); bubble.innerHTML = original; }
+        }, 28);
+      }, delay);
+    }
+
+    typewriterBubble("d1", 300);
+    typewriterBubble("d2", 2800);
+    typewriterBubble("d3", 5300);
+    typewriterBubble("d4", 7800);
+    setTimeout(() => {
+      const d5 = document.getElementById("d5");
+      if (d5) d5.classList.remove("hidden");
+    }, 10200);
+    setTimeout(() => document.getElementById("btn-s8").classList.remove("hidden"), 11500);
   }
 
+  // → Arthur then cooking game
+  function initCookingGame() {
+    const steps = [
+      { label: "Elige tu base", opts: ["🌽 Masa de maíz","🍝 Pasta fresca","🍚 Arroz jazmín"], correct: 0, msg: "¡La masa de maíz es el alma de México! 🌽" },
+      { label: "Elige tu chile", opts: ["🌶️ Chile ancho","🫑 Pimiento verde","🧅 Cebolla morada"], correct: 0, msg: "El chile ancho le da profundidad al sabor. ¡Perfecto! 🌶️" },
+      { label: "El toque final", opts: ["🍋 Limón y cilantro","🧄 Ajo y mantequilla","🍅 Tomate y albahaca"], correct: 0, msg: "¡Limón y cilantro! El acabado más mexicano del mundo. 💚" }
+    ];
+
+    let stepIdx = 0;
+    const container = document.getElementById("cooking-step");
+    const resultDiv = document.getElementById("cooking-result");
+    const btnNext   = document.getElementById("btn-s8b");
+
+    function renderStep() {
+      if (!container) return;
+      const s = steps[stepIdx];
+      container.innerHTML = `
+        <p class="cook-label">${s.label}</p>
+        <div class="cook-opts">
+          ${s.opts.map((o,i) => `<button class="cook-opt" data-idx="${i}">${o}</button>`).join("")}
+        </div>
+        <p class="cook-fb hidden" id="cook-fb"></p>
+      `;
+      container.querySelectorAll(".cook-opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const chosen = parseInt(btn.dataset.idx);
+          container.querySelectorAll(".cook-opt").forEach(b => b.disabled = true);
+          const fb = container.querySelector("#cook-fb");
+          if (chosen === s.correct) {
+            btn.classList.add("cook-correct");
+            fb.textContent = s.msg;
+            fb.classList.remove("hidden","cook-fb-wrong");
+            fb.classList.add("cook-fb-right");
+          } else {
+            btn.classList.add("cook-wrong");
+            const correctBtn = container.querySelectorAll(".cook-opt")[s.correct];
+            correctBtn.classList.add("cook-correct");
+            fb.textContent = "¡Casi! Pero Linda eligiría otra. 😄";
+            fb.classList.remove("hidden","cook-fb-right");
+            fb.classList.add("cook-fb-wrong");
+          }
+          fb.classList.remove("hidden");
+          setTimeout(() => {
+            stepIdx++;
+            if (stepIdx < steps.length) {
+              renderStep();
+            } else {
+              container.classList.add("hidden");
+              if (resultDiv) resultDiv.classList.remove("hidden");
+              setTimeout(() => { if (btnNext) btnNext.classList.remove("hidden"); }, 1000);
+            }
+          }, 1600);
+        });
+      });
+    }
+    stepIdx = 0;
+    if (container) { container.classList.remove("hidden"); container.innerHTML=""; }
+    if (resultDiv) resultDiv.classList.add("hidden");
+    if (btnNext) btnNext.classList.add("hidden");
+    renderStep();
+  }
+  document.getElementById("btn-s8b").addEventListener("click", () => goTo(10)); // → gastronomy
+
   /* ══════════════════════════════════════════════════════
-     SCENE 9 — GASTRONOMY
+     SCENE 9 — GASTRONOMY (index 10)
   ══════════════════════════════════════════════════════ */
-  document.getElementById("btn-s9").addEventListener("click", () => goTo(10));
+  document.getElementById("btn-s9").addEventListener("click", () => goTo(11)); // → letter 2
 
   /* ══════════════════════════════════════════════════════
      SCENE 10 — LETTER 2
   ══════════════════════════════════════════════════════ */
   setupEnvelope("env-s10","env-s10-cover","env-s10-letter");
-  document.getElementById("btn-s10").addEventListener("click", () => goTo(11));
+  document.getElementById("btn-s10").addEventListener("click", () => goTo(12)); // → riddle 3
 
   /* ══════════════════════════════════════════════════════
      SCENE 11 — RIDDLE 3
   ══════════════════════════════════════════════════════ */
   setupRiddle("r3-opts","r3-pos","r3-neg","btn-s11");
-  document.getElementById("btn-s11").addEventListener("click", () => goTo(12));
+  document.getElementById("btn-s11").addEventListener("click", () => goTo(13)); // → fox scene
 
   /* ══════════════════════════════════════════════════════
-     SCENE 12 — PHOTOS WITH LETTER MODAL
+     SCENE 11b — FOX SCENE
+  ══════════════════════════════════════════════════════ */
+  function initFoxScene() {
+    const lines = document.querySelectorAll(".fox-line");
+    lines.forEach(l => { l.style.opacity = "0"; l.style.animation = "none"; });
+    const btn = document.getElementById("btn-s11b");
+    if (btn) btn.classList.add("hidden");
+
+    lines.forEach((l, i) => {
+      setTimeout(() => {
+        l.style.animation = `fadeUp 1s ease forwards`;
+        l.style.opacity = "";
+      }, i * 1400 + 400);
+    });
+    setTimeout(() => { if (btn) btn.classList.remove("hidden"); }, lines.length * 1400 + 600);
+  }
+  document.getElementById("btn-s11b").addEventListener("click", () => goTo(14)); // → photos
+
+  /* ══════════════════════════════════════════════════════
+     SCENE 12 — PHOTOS WITH LETTER MODAL (index 14)
   ══════════════════════════════════════════════════════ */
   /*
     ─────────────────────────────────────────────────────────
@@ -432,10 +543,10 @@ document.addEventListener("DOMContentLoaded", () => {
   pmClose.addEventListener("click", () => modal.classList.add("hidden"));
   overlay.addEventListener("click", () => modal.classList.add("hidden"));
 
-  document.getElementById("btn-s12").addEventListener("click", () => goTo(13));
+  document.getElementById("btn-s12").addEventListener("click", () => goTo(15)); // → secret message
 
   /* ══════════════════════════════════════════════════════
-     SCENE 13 — SECRET MESSAGE ENVELOPES
+     SCENE 13 — SECRET MESSAGE ENVELOPES (index 15)
   ══════════════════════════════════════════════════════ */
   const secretEnvs   = document.querySelectorAll(".secret-env");
   const revealDiv    = document.getElementById("secret-reveal");
@@ -473,10 +584,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.getElementById("btn-s13").addEventListener("click", () => goTo(14));
+  document.getElementById("btn-s13").addEventListener("click", () => goTo(16)); // → video
 
   /* ══════════════════════════════════════════════════════
-     SCENE 14 — VIDEO
+     SCENE 14 — VIDEO (index 16)
   ══════════════════════════════════════════════════════ */
   const videoEl = document.getElementById("main-video");
   const videoPh = document.getElementById("video-ph");
@@ -490,11 +601,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (videoPh) videoPh.style.display = "flex";
   }
 
-  document.getElementById("btn-s14").addEventListener("click", () => goTo(15));
+  document.getElementById("btn-s14").addEventListener("click", () => goTo(17)); // → proposal
 
   /* ══════════════════════════════════════════════════════
-     SCENE 15 — PROPOSAL
+     SCENE 15 — PROPOSAL (index 17)
   ══════════════════════════════════════════════════════ */
+  // Day counter — set YOUR start date here (YYYY, MM-1, DD)
+  const START_DATE = new Date(2024, 10, 1); // Nov 1, 2024 — cámbiala
+  function initDayCounter() {
+    const el = document.getElementById("day-counter-num");
+    if (!el) return;
+    const days = Math.floor((Date.now() - START_DATE.getTime()) / 86400000);
+    let count = 0;
+    const timer = setInterval(() => {
+      count += Math.ceil((days - count) / 8);
+      el.textContent = count;
+      if (count >= days) { el.textContent = days; clearInterval(timer); }
+    }, 40);
+  }
+
   document.getElementById("btn-yes").addEventListener("click", () => {
     document.getElementById("prop-btns").style.display = "none";
     document.getElementById("prop-response").classList.remove("hidden");
@@ -639,5 +764,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  /* ══════════════════════════════════════════════════════
+     EASTER EGG — day counter click
+  ══════════════════════════════════════════════════════ */
+  const easterModal   = document.getElementById("easter-modal");
+  const easterOverlay = document.getElementById("easter-overlay");
+  const easterClose   = document.getElementById("easter-close");
+  const dcNum         = document.getElementById("day-counter-num");
+
+  if (dcNum) {
+    dcNum.addEventListener("click", () => {
+      if (easterModal) easterModal.classList.remove("hidden");
+    });
+  }
+  if (easterClose) easterClose.addEventListener("click", () => easterModal.classList.add("hidden"));
+  if (easterOverlay) easterOverlay.addEventListener("click", () => easterModal.classList.add("hidden"));
 
 }); // end DOMContentLoaded
