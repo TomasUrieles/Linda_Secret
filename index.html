@@ -1,42 +1,319 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Something about Linda</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Something About Linda 💗</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-    <!-- Intro -->
-    <section id="intro" class="screen">
-        <h1 class="title">Something about Linda 💗</h1>
-        <p class="subtitle">Toca la pantalla para comenzar</p>
-    </section>
+  <!-- ░░ ESCENA 0: INTRO ░░ -->
+  <section id="scene-intro" class="scene active">
+    <canvas id="starfield"></canvas>
+    <div class="intro-content">
+      <div class="vinyl-wrapper">
+        <div class="vinyl" id="vinyl"></div>
+      </div>
+      <h1 class="brand-title">Something About Linda</h1>
+      <p class="brand-sub">toca cualquier parte para comenzar</p>
+      <div class="sound-note">🎵 Activa el sonido para la experiencia completa</div>
+    </div>
+  </section>
 
-    <!-- Universo -->
-    <section id="universe" class="screen hidden">
-        <div class="stars"></div>
-        <div class="message">
-            <h2>Bienvenida a un pequeño universo hecho solo para ti ✨</h2>
-            <button id="toLetter">Continuar</button>
+  <!-- ░░ ESCENA 1: UNIVERSO ░░ -->
+  <section id="scene-universe" class="scene">
+    <canvas id="space-canvas"></canvas>
+    <div class="universe-content">
+      <div class="planet-b612">
+        <div class="planet-surface"></div>
+        <div class="tulip-on-planet">🌷</div>
+      </div>
+      <div class="universe-text">
+        <p class="universe-line" style="--d:0.3s">En algún lugar del universo…</p>
+        <p class="universe-line" style="--d:1.2s">…existe un pequeño planeta</p>
+        <p class="universe-line" style="--d:2.1s">donde vive algo muy valioso.</p>
+        <button class="btn-next" id="btn-u1">Explorar →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 2: ACERTIJO 1 ░░ -->
+  <section id="scene-riddle1" class="scene">
+    <div class="riddle-bg tulip-field"></div>
+    <div class="riddle-box">
+      <div class="riddle-icon">🌷</div>
+      <h2 class="riddle-title">Primer acertijo</h2>
+      <p class="riddle-q">Soy roja por fuera cuando me cuidan,<br>negra por dentro cuando me eliges,<br>con burbujas de felicidad y cero culpa.<br><em>¿Qué soy?</em></p>
+      <div class="riddle-options" id="riddle1-opts">
+        <button class="riddle-opt" data-correct="false">Pepsi normal</button>
+        <button class="riddle-opt" data-correct="true">Coca-Cola Zero</button>
+        <button class="riddle-opt" data-correct="false">Agua con gas</button>
+      </div>
+      <p class="riddle-feedback hidden" id="r1-ok">✨ ¡Exacto! Como tú: perfecta, sin excesos, llena de chispa.</p>
+      <p class="riddle-feedback wrong hidden" id="r1-wrong">Mmm… piénsalo bien 😏</p>
+      <button class="btn-next hidden" id="btn-r1">Siguiente →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 3: CARTA 1 ░░ -->
+  <section id="scene-letter1" class="scene">
+    <div class="stars-soft"></div>
+    <div class="letter-envelope" id="env1">
+      <div class="envelope-front">
+        <span class="env-seal">💗</span>
+        <p class="env-label">Para: Linda</p>
+        <p class="env-open-hint">toca para abrir</p>
+      </div>
+      <div class="letter-paper hidden" id="letter1-paper">
+        <h3>Carta #1</h3>
+        <p>
+          Hay algo que no te he dicho con suficientes palabras:<br><br>
+          Me gusta cómo tomas el café —latte de caramelo, siempre—,
+          cómo disfrutas el picante aunque tu cuerpo te regañe un poco después,
+          cómo tu risa llega antes de que el chiste termine.<br><br>
+          Me gusta todo lo que eres, incluyendo los ovarios que arman drama,
+          el colesterol que no se queda quieto y la diabetes que tú llevas
+          con más gracia que cualquiera que yo conozca.<br><br>
+          Eres más interesante que cualquier planeta del universo.
+        </p>
+        <button class="btn-next" id="btn-l1">Continuar ✈</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 4: ORIGAMI BIRD ░░ -->
+  <section id="scene-bird" class="scene">
+    <div class="sky-bg"></div>
+    <div class="bird-scene-content">
+      <p class="bird-prompt">La carta se convirtió en algo más…</p>
+      <div class="paper-bird-wrap" id="paper-bird-wrap">
+        <svg class="paper-bird" id="paper-bird" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="100,10 180,80 100,60 20,80" fill="#ffb6d9" stroke="#ff69b4" stroke-width="1.5"/>
+          <polygon points="100,60 180,80 100,110" fill="#ff8fbf" stroke="#ff69b4" stroke-width="1"/>
+          <polygon points="100,60 20,80 100,110" fill="#ffc8e0" stroke="#ff69b4" stroke-width="1"/>
+          <polygon points="100,10 140,50 100,60" fill="#ffd6eb" stroke="#ff69b4" stroke-width="1"/>
+          <!-- Wing left -->
+          <polygon class="wing-l" points="100,60 20,80 0,50" fill="#ff69b4" stroke="#e0559f" stroke-width="1"/>
+          <!-- Wing right -->
+          <polygon class="wing-r" points="100,60 180,80 200,50" fill="#ff69b4" stroke="#e0559f" stroke-width="1"/>
+        </svg>
+      </div>
+      <button class="btn-next" id="btn-bird" style="margin-top:2rem">Ver volar →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 5: ACERTIJO 2 ░░ -->
+  <section id="scene-riddle2" class="scene">
+    <div class="space-dark-bg"></div>
+    <div class="riddle-box neon-box">
+      <div class="riddle-icon">🎵</div>
+      <h2 class="riddle-title">Segundo acertijo</h2>
+      <p class="riddle-q">Somos dos robots que tocan con el corazón,<br>
+      nuestra música viaja entre estrellas y animación.<br>
+      Nuestro nombre suena a futuro y a pasado a la vez.<br>
+      <em>¿Quiénes somos?</em></p>
+      <div class="riddle-options" id="riddle2-opts">
+        <button class="riddle-opt" data-correct="false">Kraftwerk</button>
+        <button class="riddle-opt" data-correct="true">Daft Punk</button>
+        <button class="riddle-opt" data-correct="false">The Prodigy</button>
+      </div>
+      <p class="riddle-feedback hidden" id="r2-ok">✨ ¡Sí! Y una de sus canciones es exactamente lo que siento por ti.</p>
+      <p class="riddle-feedback wrong hidden" id="r2-wrong">Mmm… ¿en serio? 😄</p>
+      <button class="btn-next hidden" id="btn-r2">Siguiente →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 6: INTERSTELLAR 5555 / DAFT PUNK ░░ -->
+  <section id="scene-daft" class="scene">
+    <canvas id="daft-canvas"></canvas>
+    <div class="daft-content">
+      <div class="helmet-wrap">
+        <div class="helmet">
+          <div class="visor"></div>
         </div>
-    </section>
+      </div>
+      <div class="daft-text">
+        <p class="daft-line" style="--d:0.5s">"There's something about us…"</p>
+        <p class="daft-line" style="--d:1.5s">No es solo una canción.</p>
+        <p class="daft-line" style="--d:2.5s">Es lo que siento cada vez que estás cerca.</p>
+        <button class="btn-next" id="btn-daft" style="--d:3.5s">Seguir el viaje →</button>
+      </div>
+    </div>
+  </section>
 
-    <!-- Carta -->
-    <section id="letterScene" class="screen hidden tulips-bg">
-        <div class="letter" id="letter">
-            <h2>Para Linda 🌷</h2>
-            <p>
-                Dicen que cuando esperas algo con ilusión,<br>
-                el corazón empieza a ser feliz antes de tiempo…<br><br>
-                Creo que desde hoy y tal vez por siempre, empezaré a ser feliz<br>
-                todos los días un poco antes de verte.
-            </p>
-            <button id="openLetter">Abrir carta</button>
+  <!-- ░░ ESCENA 7: ARTHUR MORGAN & LA MONJA ░░ -->
+  <section id="scene-arthur" class="scene">
+    <div class="arthur-bg"></div>
+    <div class="dialogue-scene">
+      <div class="dialogue-panel left-char">
+        <div class="char-arthur">
+          <div class="arthur-hat">🤠</div>
+          <div class="arthur-body">A</div>
         </div>
-    </section>
+        <div class="speech-bubble arthur-bubble" id="ab1">
+          Hermana… últimamente me siento muy cansado.<br>
+          Como si cargara todo el peso del mundo.
+        </div>
+      </div>
+      <div class="dialogue-panel right-char">
+        <div class="char-nun">
+          <div class="nun-head">👩‍⚕️</div>
+          <div class="nun-body">N</div>
+        </div>
+        <div class="speech-bubble nun-bubble hidden" id="nb1">
+          El cansancio no es debilidad, hijo.<br>
+          Es señal de que has estado presente.
+        </div>
+      </div>
+      <div class="speech-bubble arthur-bubble hidden" id="ab2">
+        Pero hay una persona… que hace que valga la pena seguir.
+      </div>
+      <div class="speech-bubble nun-bubble hidden" id="nb2">
+        Entonces cuídala.<br>Y díselo antes de que sea tarde.
+      </div>
+      <button class="btn-next hidden" id="btn-arthur">Ella lo supo →</button>
+    </div>
+  </section>
 
-    <script src="script.js"></script>
+  <!-- ░░ ESCENA 8: FOTO GALLERY ░░ -->
+  <section id="scene-photos" class="scene">
+    <div class="photos-bg"></div>
+    <div class="photos-content">
+      <h2 class="photos-title">Momentos que guardo</h2>
+      <div class="polaroid-grid">
+        <!-- Polaroid 1 -->
+        <div class="polaroid" style="--r:-3deg; --d:0.1s">
+          <div class="polaroid-img placeholder-img">
+            <span>📷</span>
+            <p>foto 1</p>
+          </div>
+          <p class="polaroid-caption">[ tu caption aquí ]</p>
+        </div>
+        <!-- Polaroid 2 -->
+        <div class="polaroid" style="--r:2deg; --d:0.3s">
+          <div class="polaroid-img placeholder-img">
+            <span>📷</span>
+            <p>foto 2</p>
+          </div>
+          <p class="polaroid-caption">[ tu caption aquí ]</p>
+        </div>
+        <!-- Polaroid 3 -->
+        <div class="polaroid" style="--r:-1.5deg; --d:0.5s">
+          <div class="polaroid-img placeholder-img">
+            <span>📷</span>
+            <p>foto 3</p>
+          </div>
+          <p class="polaroid-caption">[ tu caption aquí ]</p>
+        </div>
+        <!-- Polaroid 4 -->
+        <div class="polaroid" style="--r:4deg; --d:0.7s">
+          <div class="polaroid-img placeholder-img">
+            <span>📷</span>
+            <p>foto 4</p>
+          </div>
+          <p class="polaroid-caption">[ tu caption aquí ]</p>
+        </div>
+      </div>
+      <button class="btn-next" id="btn-photos">Una última cosa →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 9: ACERTIJO 3 ░░ -->
+  <section id="scene-riddle3" class="scene">
+    <div class="tulip-rain" id="tulip-rain"></div>
+    <div class="riddle-box">
+      <div class="riddle-icon">🦊</div>
+      <h2 class="riddle-title">Último acertijo</h2>
+      <p class="riddle-q">El zorro dijo:<br>
+      <em>"Antes de que sean las cuatro,<br>ya soy feliz desde las tres."</em><br><br>
+      ¿De qué libro viene esta frase?</p>
+      <div class="riddle-options" id="riddle3-opts">
+        <button class="riddle-opt" data-correct="false">El Alquimista</button>
+        <button class="riddle-opt" data-correct="false">Cien años de soledad</button>
+        <button class="riddle-opt" data-correct="true">El Principito</button>
+      </div>
+      <p class="riddle-feedback hidden" id="r3-ok">💗 Exactamente. Y yo… ya soy feliz desde mucho antes de verte.</p>
+      <p class="riddle-feedback wrong hidden" id="r3-wrong">Piénsalo bien, lo sabes perfectamente 😌</p>
+      <button class="btn-next hidden" id="btn-r3">Ya casi llegamos →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 10: VIDEO ░░ -->
+  <section id="scene-video" class="scene">
+    <div class="video-bg"></div>
+    <div class="video-content">
+      <h2 class="video-title">Antes de la pregunta…</h2>
+      <p class="video-sub">hay algo que quiero que veas.</p>
+      <div class="video-frame">
+        <!-- Reemplaza src con tu video -->
+        <video id="main-video" controls poster="">
+          <source src="tu-video-aqui.mp4" type="video/mp4" />
+          Tu navegador no soporta video.
+        </video>
+        <div class="video-placeholder" id="video-placeholder">
+          <span>🎬</span>
+          <p>[ Aquí va tu video especial ]</p>
+          <small>Reemplaza "tu-video-aqui.mp4" en el HTML</small>
+        </div>
+      </div>
+      <button class="btn-next" id="btn-video">Ya estoy lista →</button>
+    </div>
+  </section>
+
+  <!-- ░░ ESCENA 11: CARTA FINAL / PROPUESTA ░░ -->
+  <section id="scene-proposal" class="scene">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="tulip-shower" id="tulip-shower"></div>
+    <div class="proposal-content">
+      <div class="proposal-letter" id="proposal-letter">
+        <div class="p-letter-header">🌷 Para Linda 🌷</div>
+        <div class="p-letter-body">
+          <p>
+            Desde que te conozco hay algo que no puedo explicar bien,
+            pero que se siente muy real: contigo, el tiempo mejora.
+          </p>
+          <p>
+            Me gusta que pidas siempre Coca-Cola Zero aunque todos sepamos
+            que el cheesecake también va a aparecer.
+            Me gusta que elijas el Buldak más picoso aunque luego me mires
+            como si yo tuviera la culpa.
+            Me gusta que conozcas el principito de memoria
+            y que te identifiques tanto con el zorro.
+          </p>
+          <p>
+            Porque yo también, Linda.
+            <em>Antes de que sean las cuatro, ya soy feliz desde las tres.</em>
+          </p>
+          <p>
+            Y después de este pequeño viaje por nuestro universo,
+            solo quiero preguntarte algo:
+          </p>
+        </div>
+        <div class="proposal-question" id="proposal-q">
+          ¿Quieres ser mi novia? 💗
+        </div>
+        <div class="proposal-buttons" id="proposal-btns">
+          <button class="btn-yes" id="btn-yes">Sí 💗</button>
+          <button class="btn-no" id="btn-no">No</button>
+        </div>
+        <div class="proposal-response hidden" id="response-yes">
+          <div class="response-emoji">🌷💗✨</div>
+          <p>Lo sabía.<br>Gracias por decir que sí.<br>Ahora somos nuestro propio universo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Audio (Something About Us - Daft Punk) -->
+  <!-- Para usar: descarga el mp3 y ponlo como "music.mp3" en la misma carpeta -->
+  <audio id="bg-music" loop>
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="script.js"></script>
 </body>
 </html>
