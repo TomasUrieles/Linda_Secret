@@ -607,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
      SCENE 15 — PROPOSAL (index 17)
   ══════════════════════════════════════════════════════ */
   // Day counter — set YOUR start date here (YYYY, MM-1, DD)
-  const START_DATE = new Date(2024, 10, 1); // Nov 1, 2024 — cámbiala
+  const START_DATE = new Date(2026, 4, 7); // Nov 1, 2024 — cámbiala
   function initDayCounter() {
     const el = document.getElementById("day-counter-num");
     if (!el) return;
