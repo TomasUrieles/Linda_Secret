@@ -8,10 +8,34 @@
 </head>
 <body>
 
-    <div id="intro" class="screen">
-        <h1 class="title">Something about Linda</h1>
-        <button id="startBtn">Entrar</button>
-    </div>
+    <!-- Intro -->
+    <section id="intro" class="screen">
+        <h1 class="title">Something about Linda 💗</h1>
+        <p class="subtitle">Toca la pantalla para comenzar</p>
+    </section>
+
+    <!-- Universo -->
+    <section id="universe" class="screen hidden">
+        <div class="stars"></div>
+        <div class="message">
+            <h2>Bienvenida a un pequeño universo hecho solo para ti ✨</h2>
+            <button id="toLetter">Continuar</button>
+        </div>
+    </section>
+
+    <!-- Carta -->
+    <section id="letterScene" class="screen hidden tulips-bg">
+        <div class="letter" id="letter">
+            <h2>Para Linda 🌷</h2>
+            <p>
+                Dicen que cuando esperas algo con ilusión,<br>
+                el corazón empieza a ser feliz antes de tiempo…<br><br>
+                Creo que desde hoy y tal vez por siempre, empezaré a ser feliz<br>
+                todos los días un poco antes de verte.
+            </p>
+            <button id="openLetter">Abrir carta</button>
+        </div>
+    </section>
 
     <script src="script.js"></script>
 </body>
